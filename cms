@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Function to extract URLs and store them in files named after CMS names
+extract_urls_and_store() {
+    local input_file=$1
+
+    # Create a directory to store files
+    mkdir -p urls_by_cms
+
+    # Extract URLs and store them in files named after CMS names
+    while read -r line; do
+        cms=$(echo "$line" | sed -n 's/.*\[cms:\([^]]*\)\].*/\1/p' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g')
+        url=$(echo "$line" | grep -o 'https\?://[^ ]\+')
+        if [ -n "$cms" ] && [ -n "$url" ]; then
+            echo "$url" >> "${cms}.txt"
+        fi
+    done < "$input_file"
+}
+
+# Check if the user provided a file as input
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <input_file>"
+    exit 1
+fi
+
+# Call the function with the input file
+extract_urls_and_store "$1"
