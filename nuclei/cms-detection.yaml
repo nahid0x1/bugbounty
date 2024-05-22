@@ -1,12 +1,12 @@
-id: fingerprinthub-web-fingerprints
+id: cms
 
 info:
-  name: FingerprintHub Technology Fingerprint
-  author: pdteam,righettod
+  name: CMS Detection
+  author: Nahid0x1
   severity: info
-  description: FingerprintHub Technology Fingerprint tests run in nuclei.
+  description: CMS Detection For Bug Bounty.
   reference:
-    - https://github.com/0x727/FingerprintHub
+    - https://github.com/nahid0x1/bugbounty
   classification:
     cwe-id: CWE-200
   tags: tech
@@ -37,16 +37,10 @@ http:
         name: wordpress
         words:
           - /xmlrpc.php
-
-      - type: word
-        name: wordpress-login
-        words:
           - /wp-login.php
-
-      - type: word
-        name: wordpress-admin
-        words:
           - /wp-admin
+          - /license.txt
+          - /wp-config.php
 
       - type: word
         name: 21grid
