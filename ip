@@ -1,0 +1,68 @@
+#!/bin/bash
+
+ip_address=$1
+
+# URL and headers
+url="https://ipinfo.io/widget/demo/$ip_address"
+cookie="_gcl_au=1.1.843572277.1716876162; _ga_RWP85XL4SC=GS1.1.1716876164.1.0.1716876164.60.0.0; _ga=GA1.1.1815227661.1716876165; __hstc=97467072.bb91931e7a53e4aa0cbfc7497db5da1e.1716876169792.1716876169792.1716876169792.1; hubspotutk=bb91931e7a53e4aa0cbfc7497db5da1e; __hssrc=1; __hssc=97467072.1.1716876169792; __stripe_mid=e0312726-9ac3-45b1-b25c-f27dbe527fd17d1eb2; __stripe_sid=4196ae4b-7e3b-400e-bc9d-9977809dbf418df22f"
+user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:126.0) Gecko/20100101 Firefox/126.0"
+
+# Make the request
+response=$(curl -s -X GET "$url" \
+  -H "Host: ipinfo.io" \
+  -H "Cookie: $cookie" \
+  -H "User-Agent: $user_agent" \
+  -H "Accept: */*" \
+  -H "Accept-Language: en-GB,en;q=0.5" \
+  -H "Accept-Encoding: gzip, deflate, br" \
+  -H "Referer: https://ipinfo.io/" \
+  -H "Content-Type: application/json" \
+  -H "Sec-Fetch-Dest: empty" \
+  -H "Sec-Fetch-Mode: cors" \
+  -H "Sec-Fetch-Site: same-origin" \
+  -H "Priority: u=1" \
+  -H "Te: trailers" \
+  -H "Connection: keep-alive")
+
+# Check if jq is installed
+if ! command -v jq &> /dev/null
+then
+    echo "jq could not be found, please install jq to run this script."
+    exit
+fi
+
+# Print the JSON response as human-readable plaintext
+echo -e "\n"
+whois $ip_address | grep -i "NetRange" --color
+echo "$response" | jq -r '
+  "IP: \(.data.ip)\n" +
+  "Hostname: \(.data.hostname)\n" +
+  "City: \(.data.city)\n" +
+  "Region: \(.data.region)\n" +
+  "Country: \(.data.country)\n" +
+  "Location: \(.data.loc)\n" +
+  "Organization: \(.data.org)\n" +
+  "Postal: \(.data.postal)\n" +
+  "Timezone: \(.data.timezone)\n" +
+  "ASN: \(.data.asn.asn)\n" +
+  "ASN Name: \(.data.asn.name)\n" +
+  "ASN Domain: \(.data.asn.domain)\n" +
+  "ASN Route: \(.data.asn.route)\n" +
+  "ASN Type: \(.data.asn.type)\n" +
+  "Company Name: \(.data.company.name)\n" +
+  "Company Domain: \(.data.company.domain)\n" +
+  "Company Type: \(.data.company.type)\n" +
+  "Privacy VPN: \(.data.privacy.vpn)\n" +
+  "Privacy Proxy: \(.data.privacy.proxy)\n" +
+  "Privacy Tor: \(.data.privacy.tor)\n" +
+  "Privacy Relay: \(.data.privacy.relay)\n" +
+  "Privacy Hosting: \(.data.privacy.hosting)\n" +
+  "Privacy Service: \(.data.privacy.service)\n" +
+  "Abuse Address: \(.data.abuse.address)\n" +
+  "Abuse Country: \(.data.abuse.country)\n" +
+  "Abuse Email: \(.data.abuse.email)\n" +
+  "Abuse Name: \(.data.abuse.name)\n" +
+  "Abuse Network: \(.data.abuse.network)\n" +
+  "Abuse Phone: \(.data.abuse.phone)\n"
+'
+
