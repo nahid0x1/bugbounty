@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Check if the input file is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <input-file>"
+    exit 1
+fi
+
+input_file=$1
+
+# Check if the input file exists
+if [ ! -f "$input_file" ]; then
+    echo "File not found: $input_file"
+    exit 1
+fi
+
+# Create the ports directory if it does not exist
+mkdir -p ports
+
+# Get the total number of lines in the input file
+total_lines=$(wc -l < "$input_file")
+processed_lines=0
+
+# Process the input file
+while IFS= read -r line
+do
+    host=$(echo $line | cut -d':' -f1)
+    port=$(echo $line | cut -d':' -f2)
+    
+    # Create a file for each port and append the host
+    echo $host >> "ports/${port}.txt"
+    
+    # Increment the processed lines count
+    ((processed_lines++))
+    
+    # Calculate and display the progress percentage
+    progress=$(( processed_lines * 100 / total_lines ))
+    echo -ne "Progress: $progress% \r"
+done < "$input_file"
+
+echo -e "\nHosts have been saved in the 'ports' directory."
